@@ -1,0 +1,46 @@
+<!--! ASP.NET page that loads and saves student records to SQL Server DB -->
+@{ 
+    var StudentId=""; var Name = ""; var Age = ""; var CourseName ="";
+    var db = Database.Open("DefaultConnection");
+    if(IsPost){
+        Name = Request.Form["Name"]; Age = Request.Form["Age"]; CourseName = Request.Form["CourseName"];
+        var insertCommand = "INSERT INTO dbo.Students (Name,Age,CourseName) Values(@0,@1,@2)";
+        db.Execute(insertCommand, Name, Age, CourseName);
+        StudentId = "";  Name = "";  Age = "";  CourseName ="";
+    }
+    var studentlist = db.Query("SELECT [StudentID],[Name],[Age],[CourseName] FROM [dbo].[Students] ORDER BY StudentId DESC");
+    db.Close();
+}
+<html>
+<head>
+  <title>Students and Courses</title>
+  <style>
+    body{line-height: 1.6em; font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;font-size: 18px; color:Indigo; background: LightGrey; margin: 0px; border:0px; padding:0px}
+    #tab{font-size: 12px;margin: 5px;text-align: left;border-collapse: collapse;}
+    #tab th{font-size: 13px; font-weight: normal;padding: 8px; color: white;background: Indigo;border-top: 2px solid #d3ddff;border-bottom: 1px solid #fff;text-align: left;}
+    #tab td{padding: 8px;border-bottom: 1px solid #fff;       color: #669;border-top: 1px solid #fff;    background: linear-gradient(Azure, Thistle)}
+    #tab tbody tr:hover td{background: linear-gradient(LightGrey,DarkGrey); color:yellow}
+    h1 {color:white; padding: 5px; }
+    header {background:url(header.png) no-repeat}
+  </style> 
+</head>
+<body onload="document.addrec.Name.focus();">
+<header>
+<h1>Students</h1>    
+<div id="labels" style="font-size:12px; position:relative; top:10px; left:0px; color:white">Name<span style="margin-left:55px;">Age</span><span style="margin-left:68px;">Course Name</span></div>
+<form name="addrec" method="post" action="">
+  <input type="text" name="Name" value="@Name" style="width:80px; margin-left:0px;" />
+  <input type="text" name="Age" value="@Age" style="width:80px;" />
+  <input type="text" name="CourseName" value="@CourseName" style="width:210px;" />
+  <input type="submit" name="buttonSubmit" value="Add" />
+</form>
+</header>
+   <table id="tab">            
+    <thead><tr><th>Student ID</th><th>Name</th><th>Age</th><th>Course Name</th></tr></thead>
+    <tbody>
+     @foreach(var Item in studentlist)
+     {<tr><td>@Item.StudentId</td><td>@Item.Name</td><td>@Item.Age</td><td>@Item.CourseName</td></tr>}
+     </tbody>
+  </table>
+</body>
+</html>
